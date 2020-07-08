@@ -1,12 +1,10 @@
 import React from 'react';
-
+import Cart from './CartItem';
 
 function App() {
-  return (
-    <div className="App">
-      <h1>Cart</h1>
-    </div>
-  );
+    return(
+      <Cart/>
+    )
 }
 
 export default App;
