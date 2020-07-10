@@ -1,15 +1,7 @@
 import React from 'react';
 
 class CartItem extends React.Component{
-    constructor(){
-        super();
-        this.state={
-           title:'phone',
-           price : 999,
-           qty : 1
-        }
-    }
-
+    
     IncreaseQuantity = ()=>{
         this.setState((prevState)=>{
              return {
@@ -32,8 +24,9 @@ class CartItem extends React.Component{
 
 
     render(){
-
-        const {title ,price, qty} = this.state;
+        
+        const {title ,price, qty} = this.props.product;
+        
         return (
             <div className="cart-item">
             <div className="left-block">
@@ -49,15 +42,20 @@ class CartItem extends React.Component{
                       alt = "plus" 
                       className ="action-icons" 
                       src = "https://image.flaticon.com/icons/svg/992/992482.svg"
-                      onClick = {this.IncreaseQuantity}
+                      onClick = {()=>{this.props.onIncreaseQuantity(this.props.product)}}
                     />
                   <img 
                      alt = "minus" 
                      className = "action-icons" 
                      src = "https://image.flaticon.com/icons/svg/992/992514.svg"
-                     onClick = {this.DecreaseQuantity}
+                     onClick = {()=>{this.props.onDecreaseQuantity(this.props.product)}}
                   />
-                  <img alt = "delete" className="action-icons" src = "https://image.flaticon.com/icons/svg/833/833434.svg"/>
+                  <img 
+                    alt = "delete" 
+                    className="action-icons" 
+                    src = "https://image.flaticon.com/icons/svg/833/833434.svg"
+                    onClick = {()=>{this.props.onDeleteProduct(this.props.product.id)}}
+                    />
               </div>
             </div>
           </div>
