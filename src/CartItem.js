@@ -1,31 +1,8 @@
 import React from 'react';
 
-class CartItem extends React.Component{
-    
-    IncreaseQuantity = ()=>{
-        this.setState((prevState)=>{
-             return {
-                 qty : prevState.qty + 1,
-                 price : prevState.price + 999
-             }
-        })
-    }
+const CartItem = (props)=>{
 
-    DecreaseQuantity = ()=>{
-        this.setState((prevState)=>{
-            if(prevState.qty===0)
-                return;
-            return {
-                qty : prevState.qty - 1,
-                price : prevState.price - 999
-            }
-        })
-    }
-
-
-    render(){
-        
-        const {title ,price, qty} = this.props.product;
+        const {title ,price, qty} = props.product;
         
         return (
             <div className="cart-item">
@@ -42,25 +19,25 @@ class CartItem extends React.Component{
                       alt = "plus" 
                       className ="action-icons" 
                       src = "https://image.flaticon.com/icons/svg/992/992482.svg"
-                      onClick = {()=>{this.props.onIncreaseQuantity(this.props.product)}}
+                      onClick = {()=>{props.onIncreaseQuantity(props.product)}}
                     />
                   <img 
                      alt = "minus" 
                      className = "action-icons" 
                      src = "https://image.flaticon.com/icons/svg/992/992514.svg"
-                     onClick = {()=>{this.props.onDecreaseQuantity(this.props.product)}}
+                     onClick = {()=>{props.onDecreaseQuantity(props.product)}}
                   />
                   <img 
                     alt = "delete" 
                     className="action-icons" 
                     src = "https://image.flaticon.com/icons/svg/833/833434.svg"
-                    onClick = {()=>{this.props.onDeleteProduct(this.props.product.id)}}
+                    onClick = {()=>{props.onDeleteProduct(props.product.id)}}
                     />
               </div>
             </div>
           </div>
         );
-    }
+    
 }
 
 const style = {
