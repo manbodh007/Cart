@@ -1,68 +1,130 @@
 import React from 'react';
 import Cart from './Cart';
 import Navbar from './Navbar';
+import * as firebase from 'firebase';
 
 
 class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      products: [
-        {
-          title: 'Mobile Phone',
-          price: 10000,
-          img:'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=80',
-          qty: 1,
-          id: 1,
-        },
-        {
-          title: 'Watch',
-          price: 999,
-          img:'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1059&q=80',
-          qty: 1,
-          id: 2,
-        },
-        {
-          title: 'Laptop',
-          price: 99999,
-          img:'https://images.unsplash.com/photo-1542393545-10f5cde2c810?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=701&q=80',
-          qty: 1,
-          id: 3,
-        }
-
-      ]
-
+      products: [],
+      loading:true
     }
+
+    this.db = firebase.firestore();
   }
+
+  componentDidMount(){
+    // firebase
+    //   .firestore()
+    //   .collection('products')
+    //   .get()
+    //   .then((snapshot)=>{
+    //        console.log(snapshot);
+    //        snapshot.docs.map((doc)=>{
+    //           console.log(doc.data);
+    //           return '';
+    //        });
+
+    //        const products = snapshot.docs.map((doc)=>{
+    //          const data = doc.data();
+    //           data.id = doc.id;
+    //          return data;
+    //        });
+
+    //        this.setState({
+    //          products:products,
+    //          loading : false
+    //         });
+    //   })
+
+     // adding listner 
+     this.db
+     .collection('products')
+    //  .where('price','==',1000)
+     .orderBy('price','desc')  // order data in descending order
+     .onSnapshot((snapshot)=>{
+      console.log(snapshot);
+      snapshot.docs.map((doc)=>{
+         console.log(doc.data);
+         return '';
+      });
+
+      const products = snapshot.docs.map((doc)=>{
+        const data = doc.data();
+         data.id = doc.id;
+        return data;
+      });
+
+      this.setState({
+        products:products,
+        loading : false
+       });
+     });
+}
 
   handleIncreaseQuantity = (item) => {
     const { products } = this.state;
     let index = products.indexOf(item);
-    products[index].qty += 1;
-    this.setState({
-      products: products
-    })
+    // products[index].qty += 1;
+    // this.setState({
+    //   products: products
+    // })
+
+    const docRef = this.db.collection('products').doc(products[index].id);
+    
+    docRef
+      .update({
+        qty:products[index].qty + 1
+      }).then(()=>{
+        console.log('update successfully');
+      }).catch((error)=>{
+          console.log('error in update value',error);
+      })
+
   }
 
   handleDecreaseQuantity = (item) => {
     const { products } = this.state;
     let index = products.indexOf(item);
 
-    if (products[index].qty > 0)
-      products[index].qty -= 1;
+     if (products[index].qty <= 0)
+         return;
 
-    this.setState({
-      products: products
-    });
+    // this.setState({
+    //   products: products,
+    // });
+
+    const docRef = this.db.collection('products').doc(products[index].id);
+    
+    docRef
+      .update({
+        qty:products[index].qty - 1
+      }).then(()=>{
+        console.log('update successfully');
+      }).catch((error)=>{
+          console.log('error in update value',error);
+      })
+
   }
 
   handleDeleteProduct = (id) => {
-    const { products } = this.state;
-    let items = products.filter((item) => { return item.id !== id });
+    // const { products} = this.state;
+    // let items = products.filter((item) => { return item.id !== id });
 
-    this.setState({
-      products: items
-    });
+    // this.setState({
+    //   products: items
+    // });
+    const docRef = this.db.collection('products').doc(id);
+    docRef
+      .delete()
+      .then(()=>{
+        console.log('deleted successfully');
+      }).catch((error)=>{
+          console.log('error in update value',error);
+      })
+      
   }
   getCount = ()=>{
     const {products} = this.state;
@@ -72,18 +134,21 @@ class App extends React.Component {
     })
     return count;
   }
+
+  
   getCartTotal(){
     const {products} = this.state;
     let cartTotal = 0;
     products.map((product)=>{
         cartTotal = cartTotal + product.qty * product.price;
+        return '';
     })
     return cartTotal;
   }
 
   render() {
 
-    const {products} = this.state;
+    const {products , loading} = this.state;
     return (
       <div>
         <Navbar 
@@ -96,6 +161,7 @@ class App extends React.Component {
           onDecreaseQuantity={this.handleDecreaseQuantity}
           onDeleteProduct={this.handleDeleteProduct}
         />
+        {loading && <h1 style = {{textAlign:'center', fontFamily:'monospace'}}>loading...</h1>}
         <div style={{padding:10,fontSize:30}}>
           TOTAL:{this.getCartTotal()}
         </div>
